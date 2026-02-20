@@ -1,0 +1,37 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+[[mods]]
+modId="rpgem_forging"
+version="${mod_version}"
+displayName="RPGEM Forging+"
+description='''
+RPGEM Forging+: The Ancient Forge upgrade and repair system.
+Provides equipment enhancement via upgrade stones and fail-stack mechanics.
+Requires RPGEM Core.
+'''
+
+# Dependency: NeoForge
+[[dependencies.rpgem_forging]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+# Dependency: Minecraft
+[[dependencies.rpgem_forging]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Dependency: RPGEM Core (required)
+[[dependencies.rpgem_forging]]
+    modId="rpgem_core"
+    type="required"
+    versionRange="[1.0.0,)"
+    ordering="AFTER"
+    side="BOTH"
