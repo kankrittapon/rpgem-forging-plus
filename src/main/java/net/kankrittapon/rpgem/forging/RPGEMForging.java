@@ -46,13 +46,17 @@ public class RPGEMForging {
 
     private void addCreative(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == net.kankrittapon.rpgem.core.init.ModCreativeModeTabs.RPGEM_TAB_KEY) {
-            event.accept(ModForgingBlocks.ANCIENT_FORGE);
-            event.accept(ModForgingItems.UPGRADE_STONE_TIER_1);
-            event.accept(ModForgingItems.UPGRADE_STONE_TIER_2);
-            event.accept(ModForgingItems.UPGRADE_STONE_TIER_3);
+            // Add items from this module
+            event.accept(ModForgingItems.ANCIENT_FORGE_ITEM);
+
             event.accept(ModForgingItems.MEMORY_FRAGMENT);
             event.accept(ModForgingItems.PROTECTION_STONE);
             event.accept(ModForgingItems.ARTISANS_MEMORY);
+
+            event.accept(ModForgingItems.UPGRADE_STONE_TIER_1);
+            event.accept(ModForgingItems.UPGRADE_STONE_TIER_2);
+            event.accept(ModForgingItems.UPGRADE_STONE_TIER_3);
+
             event.accept(ModForgingItems.FORGED_STONE_FORTITUDE);
             event.accept(ModForgingItems.FORGED_STONE_AGILITY);
             event.accept(ModForgingItems.FORGED_STONE_DESTRUCTION);

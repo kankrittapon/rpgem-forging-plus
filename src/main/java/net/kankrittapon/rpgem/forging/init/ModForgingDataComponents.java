@@ -17,38 +17,18 @@ import java.util.function.UnaryOperator;
  */
 public class ModForgingDataComponents {
 
-    public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister
-            .createDataComponents(RPGEMForging.MODID);
+        public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister
+                        .createDataComponents(RPGEMForging.MODID);
 
-    /** Current upgrade level of a piece of equipment (+1 to +28/Ultimate). */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> UPGRADE_LEVEL = register(
-            "upgrade_level",
-            builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT)
-                    .networkSynchronized(ByteBufCodecs.VAR_INT));
+        // Data components moved to rpgem-core: ModDataComponents
+        // UPGRADE_LEVEL, ARMOR_PATH, ORIGINAL_NAME
 
-    /**
-     * Armor upgrade path chosen with first Forged Stone application.
-     * Values: "none" | "reduction" | "evasion"
-     */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> ARMOR_PATH = register(
-            "armor_path",
-            builder -> builder.persistent(Codec.STRING)
-                    .networkSynchronized(ByteBufCodecs.STRING_UTF8));
+        private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(
+                        String name, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
+                return DATA_COMPONENTS.register(name, () -> builderOperator.apply(DataComponentType.builder()).build());
+        }
 
-    /**
-     * Serialised JSON of the item's original display name (before upgrade prefix).
-     */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> ORIGINAL_NAME = register(
-            "original_name",
-            builder -> builder.persistent(Codec.STRING)
-                    .networkSynchronized(ByteBufCodecs.STRING_UTF8));
-
-    private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(
-            String name, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
-        return DATA_COMPONENTS.register(name, () -> builderOperator.apply(DataComponentType.builder()).build());
-    }
-
-    public static void register(IEventBus eventBus) {
-        DATA_COMPONENTS.register(eventBus);
-    }
+        public static void register(IEventBus eventBus) {
+                DATA_COMPONENTS.register(eventBus);
+        }
 }

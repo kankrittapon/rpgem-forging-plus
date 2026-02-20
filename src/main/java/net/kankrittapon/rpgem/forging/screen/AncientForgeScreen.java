@@ -1,7 +1,8 @@
 package net.kankrittapon.rpgem.forging.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.kankrittapon.rpgem.forging.init.ModForgingAttachments;
+import net.kankrittapon.rpgem.core.init.ModAttachments;
+import net.kankrittapon.rpgem.core.init.ModItems;
 import net.kankrittapon.rpgem.forging.init.ModForgingItems;
 import net.kankrittapon.rpgem.forging.menu.AncientForgeMenu;
 import net.kankrittapon.rpgem.forging.network.PacketUpgradeItem;
@@ -94,7 +95,7 @@ public class AncientForgeScreen extends AbstractContainerScreen<AncientForgeMenu
         // Fail Stack label
         int failStack = 0;
         if (this.minecraft != null && this.minecraft.player != null) {
-            failStack = this.minecraft.player.getData(ModForgingAttachments.FAIL_STACK);
+            failStack = this.minecraft.player.getData(ModAttachments.FAIL_STACK);
         }
         guiGraphics.drawString(this.font, "FS: " + failStack,
                 TEXT_FS_X, TEXT_FS_Y, 0xFF5555, false);

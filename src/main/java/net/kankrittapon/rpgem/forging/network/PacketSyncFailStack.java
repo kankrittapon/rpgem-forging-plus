@@ -2,7 +2,7 @@ package net.kankrittapon.rpgem.forging.network;
 
 import io.netty.buffer.ByteBuf;
 import net.kankrittapon.rpgem.forging.RPGEMForging;
-import net.kankrittapon.rpgem.forging.init.ModForgingAttachments;
+import net.kankrittapon.rpgem.core.init.ModAttachments;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -33,7 +33,7 @@ public record PacketSyncFailStack(int failStack) implements CustomPacketPayload 
             // Only runs on client side
             if (context.flow().isClientbound() && Minecraft.getInstance().player != null) {
                 Minecraft.getInstance().player
-                        .setData(ModForgingAttachments.FAIL_STACK, message.failStack());
+                        .setData(ModAttachments.FAIL_STACK, message.failStack());
             }
         });
     }

@@ -17,12 +17,7 @@ public class ModForgingAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister
             .create(NeoForgeRegistries.ATTACHMENT_TYPES, RPGEMForging.MODID);
 
-    /**
-     * Fail Stack: tracks upgrade failures to boost future success rates.
-     * Default: 0. Each failure increases by 1.
-     */
-    public static final Supplier<AttachmentType<Integer>> FAIL_STACK = ATTACHMENT_TYPES.register("fail_stack",
-            () -> AttachmentType.builder(() -> 0).serialize(Codec.INT).build());
+    // FAIL_STACK moved to rpgem-core: ModAttachments.FAIL_STACK
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);

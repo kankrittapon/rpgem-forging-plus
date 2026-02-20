@@ -1,9 +1,10 @@
 package net.kankrittapon.rpgem.forging.block.entity;
 
-import net.kankrittapon.rpgem.forging.init.ModForgingAttachments;
-import net.kankrittapon.rpgem.forging.init.ModForgingBlockEntities;
-import net.kankrittapon.rpgem.forging.init.ModForgingDataComponents;
+import net.kankrittapon.rpgem.core.init.ModAttachments;
+import net.kankrittapon.rpgem.core.init.ModDataComponents;
+import net.kankrittapon.rpgem.core.init.ModItems;
 import net.kankrittapon.rpgem.forging.init.ModForgingItems;
+import net.kankrittapon.rpgem.forging.init.ModForgingBlockEntities;
 import net.kankrittapon.rpgem.forging.config.ForgingConfig;
 import net.kankrittapon.rpgem.forging.menu.AncientForgeMenu;
 import net.minecraft.core.BlockPos;
@@ -131,27 +132,27 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
             return;
         }
 
-        int upgradeLevel = equipment.getOrDefault(ModForgingDataComponents.UPGRADE_LEVEL.get(), 0);
+        int upgradeLevel = equipment.getOrDefault(ModDataComponents.UPGRADE_LEVEL.get(), 0);
         int repairAmount;
 
         if (upgradeLevel > 0) {
-            repairAmount = 1;
+            repairAmount = ForgingConfig.REPAIR_AMOUNT_EPIC_LEGENDARY.get();
         } else {
             net.minecraft.world.item.Rarity rarity = equipment.getRarity();
             if (rarity == net.minecraft.world.item.Rarity.COMMON)
-                repairAmount = 10;
+                repairAmount = ForgingConfig.REPAIR_AMOUNT_COMMON.get();
             else if (rarity == net.minecraft.world.item.Rarity.UNCOMMON)
-                repairAmount = 5;
+                repairAmount = ForgingConfig.REPAIR_AMOUNT_UNCOMMON.get();
             else if (rarity == net.minecraft.world.item.Rarity.RARE)
-                repairAmount = 2;
+                repairAmount = ForgingConfig.REPAIR_AMOUNT_RARE.get();
             else
-                repairAmount = 1;
+                repairAmount = ForgingConfig.REPAIR_AMOUNT_EPIC_LEGENDARY.get();
         }
 
-        // Artisan's Memory boost ×5
+        // Artisan's Memory boost
         boolean useArtisan = !support.isEmpty() && support.is(ModForgingItems.ARTISANS_MEMORY.get());
         if (useArtisan) {
-            repairAmount *= 5;
+            repairAmount *= ForgingConfig.ARTISAN_MEMORY_MULTIPLIER.get();
         }
 
         int newDamage = Math.max(0, equipment.getDamageValue() - repairAmount);
@@ -160,7 +161,8 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
 
         if (useArtisan) {
             support.shrink(1);
-            player.sendSystemMessage(Component.literal("§6[Artisan's Memory] Repair Boost Activated! (×5)"));
+            player.sendSystemMessage(Component.literal("§6[Artisan's Memory] Repair Boost Activated! (×"
+                    + ForgingConfig.ARTISAN_MEMORY_MULTIPLIER.get() + ")"));
         }
 
         level.playSound(null, this.getBlockPos(),
@@ -181,7 +183,7 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
         if (equipment.isEmpty() || stone.isEmpty())
             return;
 
-        int currentLevel = equipment.getOrDefault(ModForgingDataComponents.UPGRADE_LEVEL.get(), 0);
+        int currentLevel = equipment.getOrDefault(ModDataComponents.UPGRADE_LEVEL.get(), 0);
         int nextLevel = currentLevel + 1;
 
         // ===== Tier determination =====
@@ -253,8 +255,8 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
         else
             baseChance = ForgingConfig.UPGRADE_SUCCESS_RATE_TIER_3.get();
 
-        int failStack = player.getData(ModForgingAttachments.FAIL_STACK);
-        double successRate = Math.min(1.0, baseChance + failStack * 0.01);
+        int failStack = player.getData(ModAttachments.FAIL_STACK);
+        double successRate = Math.min(1.0, baseChance + failStack * ForgingConfig.FAILSTACK_BONUS_PER_STACK.get());
 
         player.displayClientMessage(Component.literal(
                 "§eChance: " + (int) (successRate * 100) + "% (Base: "
@@ -265,20 +267,20 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
         stone.shrink(1);
 
         if (success) {
-            equipment.set(ModForgingDataComponents.UPGRADE_LEVEL.get(), nextLevel);
+            equipment.set(ModDataComponents.UPGRADE_LEVEL.get(), nextLevel);
             updateItemName(equipment, nextLevel);
 
             // Set armor path on first Forged Stone use
             if (isForgedStone && isArmor(equipment)) {
-                String currentPath = equipment.getOrDefault(ModForgingDataComponents.ARMOR_PATH.get(), "none");
+                String currentPath = equipment.getOrDefault(ModDataComponents.ARMOR_PATH.get(), "none");
                 if (currentPath.equals("none")) {
                     String newPath = forgedType.equals("fortitude") ? "reduction" : "evasion";
-                    equipment.set(ModForgingDataComponents.ARMOR_PATH.get(), newPath);
+                    equipment.set(ModDataComponents.ARMOR_PATH.get(), newPath);
                 }
             }
 
             // Reset fail stack
-            player.setData(ModForgingAttachments.FAIL_STACK, 0);
+            player.setData(ModAttachments.FAIL_STACK, 0);
             if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
                 net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(sp,
                         new net.kankrittapon.rpgem.forging.network.PacketSyncFailStack(0));
@@ -293,7 +295,7 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
         } else {
             // Increment fail stack
             int newFs = failStack + 1;
-            player.setData(ModForgingAttachments.FAIL_STACK, newFs);
+            player.setData(ModAttachments.FAIL_STACK, newFs);
             if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
                 net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(sp,
                         new net.kankrittapon.rpgem.forging.network.PacketSyncFailStack(newFs));
@@ -301,7 +303,8 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
 
             // Durability penalty
             if (equipment.isDamageableItem()) {
-                int newDamage = Math.min(equipment.getMaxDamage(), equipment.getDamageValue() + 10);
+                int newDamage = Math.min(equipment.getMaxDamage(),
+                        equipment.getDamageValue() + ForgingConfig.DURABILITY_PENALTY_ON_FAILURE.get());
                 equipment.setDamageValue(newDamage);
             }
 
@@ -315,7 +318,7 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
                 } else {
                     int downgradedLevel = Math.max(15, currentLevel - 1);
                     if (downgradedLevel < currentLevel) {
-                        equipment.set(ModForgingDataComponents.UPGRADE_LEVEL.get(), downgradedLevel);
+                        equipment.set(ModDataComponents.UPGRADE_LEVEL.get(), downgradedLevel);
                         updateItemName(equipment, downgradedLevel);
                         player.sendSystemMessage(Component.literal(
                                 "§c⚠ Upgrade Failed! Item downgraded to " + getFormattedLevel(downgradedLevel)));
@@ -371,8 +374,8 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
         Component originalName;
         String originalJson;
 
-        if (stack.has(ModForgingDataComponents.ORIGINAL_NAME.get())) {
-            originalJson = stack.get(ModForgingDataComponents.ORIGINAL_NAME.get());
+        if (stack.has(ModDataComponents.ORIGINAL_NAME.get())) {
+            originalJson = stack.get(ModDataComponents.ORIGINAL_NAME.get());
             originalName = Component.Serializer.fromJson(originalJson,
                     this.level != null ? this.level.registryAccess() : null);
             if (originalName == null)
@@ -381,7 +384,7 @@ public class AncientForgeBlockEntity extends BlockEntity implements MenuProvider
             originalName = stack.getHoverName();
             net.minecraft.core.RegistryAccess ra = this.level != null ? this.level.registryAccess() : null;
             originalJson = Component.Serializer.toJson(originalName, ra);
-            stack.set(ModForgingDataComponents.ORIGINAL_NAME.get(), originalJson);
+            stack.set(ModDataComponents.ORIGINAL_NAME.get(), originalJson);
         }
 
         String prefix = getUpgradePrefix(upgradeLevel);
